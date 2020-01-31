@@ -1,0 +1,134 @@
+install_github("BillPetti/baseballr")
+
+library(baseballr)
+
+### Let me know if there is a more efficient way to scrape a year's worth of Statcast data
+
+date328407 = baseballr::scrape_statcast_savant(start_date = '2019-03-28',
+                                               end_date = '2019-04-07', player_type = 'batter')
+date408414 = baseballr::scrape_statcast_savant(start_date = '2019-04-08',
+                                           end_date = '2019-04-14', player_type = 'batter')
+date415421 = baseballr::scrape_statcast_savant(start_date = '2019-04-15',
+                                               end_date = '2019-04-21', player_type = 'batter')
+date422428 = baseballr::scrape_statcast_savant(start_date = '2019-04-22',
+                                               end_date = '2019-04-28', player_type = 'batter')
+date429505 = baseballr::scrape_statcast_savant(start_date = '2019-04-29',
+                                               end_date = '2019-05-05', player_type = 'batter')
+date506512 = baseballr::scrape_statcast_savant(start_date = '2019-05-06',
+                                               end_date = '2019-05-12', player_type = 'batter')
+date513519 = baseballr::scrape_statcast_savant(start_date = '2019-05-13',
+                                               end_date = '2019-05-19', player_type = 'batter')
+date520526 = baseballr::scrape_statcast_savant(start_date = '2019-05-20',
+                                               end_date = '2019-05-26', player_type = 'batter')
+date527602 = baseballr::scrape_statcast_savant(start_date = '2019-05-27',
+                                               end_date = '2019-06-02', player_type = 'batter')
+date603609 = baseballr::scrape_statcast_savant(start_date = '2019-06-03',
+                                               end_date = '2019-06-09', player_type = 'batter')
+date610616 = baseballr::scrape_statcast_savant(start_date = '2019-06-10',
+                                               end_date = '2019-06-16', player_type = 'batter')
+date617623 = baseballr::scrape_statcast_savant(start_date = '2019-06-17',
+                                               end_date = '2019-06-23', player_type = 'batter')
+date624630 = baseballr::scrape_statcast_savant(start_date = '2019-06-24',
+                                               end_date = '2019-06-30', player_type = 'batter')
+date701707 = baseballr::scrape_statcast_savant(start_date = '2019-07-01',
+                                               end_date = '2019-07-07', player_type = 'batter')
+date708714 = baseballr::scrape_statcast_savant(start_date = '2019-07-08',
+                                               end_date = '2019-07-14', player_type = 'batter')
+date715721 = baseballr::scrape_statcast_savant(start_date = '2019-07-15',
+                                               end_date = '2019-07-21', player_type = 'batter')
+date722728 = baseballr::scrape_statcast_savant(start_date = '2019-07-22',
+                                               end_date = '2019-07-28', player_type = 'batter')
+date729804 = baseballr::scrape_statcast_savant(start_date = '2019-07-29',
+                                               end_date = '2019-08-04', player_type = 'batter')
+date805811 = baseballr::scrape_statcast_savant(start_date = '2019-08-05',
+                                               end_date = '2019-08-11', player_type = 'batter')
+date812818 = baseballr::scrape_statcast_savant(start_date = '2019-08-12',
+                                               end_date = '2019-08-18', player_type = 'batter')
+date819825 = baseballr::scrape_statcast_savant(start_date = '2019-08-19',
+                                               end_date = '2019-08-25', player_type = 'batter')
+date826901 = baseballr::scrape_statcast_savant(start_date = '2019-08-26',
+                                               end_date = '2019-09-01', player_type = 'batter')
+date902908 = baseballr::scrape_statcast_savant(start_date = '2019-09-02',
+                                               end_date = '2019-09-08', player_type = 'batter')
+date909915 = baseballr::scrape_statcast_savant(start_date = '2019-09-09',
+                                               end_date = '2019-09-15', player_type = 'batter')
+date916922 = baseballr::scrape_statcast_savant(start_date = '2019-09-16',
+                                               end_date = '2019-09-22', player_type = 'batter')
+date923929 = baseballr::scrape_statcast_savant(start_date = '2019-09-23',
+                                               end_date = '2019-09-29', player_type = 'batter')
+
+
+SavantHitterData19 = rbind(date328407, date408414, date415421, 
+                           date422428, date429505, date506512, 
+                           datdate527602, date603609, date610616, date617623,
+                           date624630, date701707, date708714, date715721,
+                           date722728, date729804, date805811, date812818,
+                           date819825, date826901, date902908, date909915,
+                           date916922, date923929)
+
+write.csv(SavantHitterData19, "SavantHitterData19ALL.csv", row.names = F) 
+
+library(RSQLite)
+library(DBI)
+
+db = dbConnect(SQLite(), dbname = "Statcast.sqlite")
+
+dbWriteTable(conn = db, name = "Statcast_Hitting", SavantHitterData19ALL, 
+             overwrite = T, row.names = F)
+
+dbGetQuery(conn = db, "SELECT * FROM Statcast_Hitting LIMIT 5")
+
+SavantData19 = dbGetQuery(conn = db, "SELECT * FROM Statcast_Hitting")
+
+##### This is looking at swinging strike % on all pitches 95 and above
+
+TotalFB = SavantData19 %>%
+  filter(release_speed >= 95) %>%
+  select(player_name, description) %>%
+  group_by(player_name) %>%
+  summarise(TotFB = n())
+
+SwStrFB = SavantData19 %>%
+  filter(release_speed >= 95, description == "swinging_strike") %>%
+  select(player_name, description) %>%
+  group_by(player_name) %>%
+  summarise(SwStrFBs = n())
+
+SwStrFBpercentage = merge(x = TotalFB, y = SwStrFB, by = "player_name") %>%
+  filter(TotFB >= 125) %>%
+  mutate(FBSwStrPct = round(SwStrFBs/TotFB, 3)*100) %>%
+  arrange(desc(FBSwStrPct)) %>%
+  top_n(n = 50)
+
+write.csv(SwStrFBpercentage, "SwStrFBPct.csv", row.names = F)
+
+##### Given the current high fastball - low curveball trend, 
+##### this is where I look at swinging strike % on pitches 93+ UP in the zone 
+##### (Statcast Zones 1,2,3,11,and 12)
+##### I also bring the velocity minimum down to 93, to more match an average fastball
+
+TotalFBUp = SavantData19 %>%
+  filter(release_speed >= 93, zone == "1" | zone == "2" | zone == "3" | 
+           zone == "11" | zone == "12") %>%
+  select(player_name, description) %>%
+  group_by(player_name) %>%
+  summarise(TotFBUp = n())
+
+SwStrFBUp = SavantData19 %>%
+  filter(release_speed >= 93, description == "swinging_strike", zone == "1" | 
+           zone == "2" | zone == "3" | zone == "11" | zone == "12") %>%
+  select(player_name, description) %>%
+  group_by(player_name) %>%
+  summarise(SwStrFBsUp = n())
+
+##### In this results table, I will also include the MLB average for 
+##### swinging strike % on 93+ in these high zones
+
+SwStrFBUpPercentage = merge(x = TotalFBUp, y = SwStrFBUp, by = "player_name") %>%
+  mutate(MLBavg = round(mean(SwStrFBsUp/TotFBUp), 4)*100) %>%
+  filter(TotFBUp >= 75) %>%
+  mutate(FBUpSwStrPct = round(SwStrFBsUp/TotFBUp, 3)*100) %>%
+  arrange(desc(FBUpSwStrPct)) %>%
+  top_n(n = 50)
+
+write.csv(SwStrFBUpPercentage, "FBUpSwStrPct.csv", row.names = F)
