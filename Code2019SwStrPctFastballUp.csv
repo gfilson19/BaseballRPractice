@@ -73,36 +73,11 @@ db = dbConnect(SQLite(), dbname = "Statcast.sqlite")
 dbWriteTable(conn = db, name = "Statcast_Hitting", SavantHitterData19ALL, 
              overwrite = T, row.names = F)
 
-dbGetQuery(conn = db, "SELECT * FROM Statcast_Hitting LIMIT 5")
-
 SavantData19 = dbGetQuery(conn = db, "SELECT * FROM Statcast_Hitting")
-
-##### This is looking at swinging strike % on all pitches 95 and above
-
-TotalFB = SavantData19 %>%
-  filter(release_speed >= 95) %>%
-  select(player_name, description) %>%
-  group_by(player_name) %>%
-  summarise(TotFB = n())
-
-SwStrFB = SavantData19 %>%
-  filter(release_speed >= 95, description == "swinging_strike") %>%
-  select(player_name, description) %>%
-  group_by(player_name) %>%
-  summarise(SwStrFBs = n())
-
-SwStrFBpercentage = merge(x = TotalFB, y = SwStrFB, by = "player_name") %>%
-  filter(TotFB >= 125) %>%
-  mutate(FBSwStrPct = round(SwStrFBs/TotFB, 3)*100) %>%
-  arrange(desc(FBSwStrPct)) %>%
-  top_n(n = 50)
-
-write.csv(SwStrFBpercentage, "SwStrFBPct.csv", row.names = F)
 
 ##### Given the current high fastball - low curveball trend, 
 ##### this is where I look at swinging strike % on pitches 93+ UP in the zone 
 ##### (Statcast Zones 1,2,3,11,and 12)
-##### I also bring the velocity minimum down to 93, to more match an average fastball
 
 TotalFBUp = SavantData19 %>%
   filter(release_speed >= 93, zone == "1" | zone == "2" | zone == "3" | 
