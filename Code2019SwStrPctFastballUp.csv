@@ -56,13 +56,12 @@ date923929 = baseballr::scrape_statcast_savant(start_date = '2019-09-23',
                                                end_date = '2019-09-29', player_type = 'batter')
 
 
-SavantHitterData19 = rbind(date328407, date408414, date415421, 
-                           date422428, date429505, date506512, 
-                           datdate527602, date603609, date610616, date617623,
-                           date624630, date701707, date708714, date715721,
-                           date722728, date729804, date805811, date812818,
-                           date819825, date826901, date902908, date909915,
-                           date916922, date923929)
+SavantHitterData19 = rbind(date328407, date408414, date415421, date422428, 
+                           date429505, date506512, date513519, date520526, 
+                           date527602, date603609, date610616, date617623, 
+                           date624630, date701707, date708714, date715721, 
+                           date722728, date729804, date805811, date812818, 
+                           date819825, date826901, date902908, date909915, date916922, date923929)
 
 write.csv(SavantHitterData19, "SavantHitterData19ALL.csv", row.names = F) 
 
