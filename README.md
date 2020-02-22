@@ -1,2 +1,2 @@
 # LearningR
-Follow along as I try to learn how to manipulate the billions of data points in professional baseball
+Follow along as I practice using R to analyze baseball data
