@@ -1,8 +1,9 @@
-#This graph ended up implying that hitters with lower BB-K ratios would see lower standard
+#This graph (included in this repository) ended up implying that hitters with lower BB-K ratios would see lower standard
 #deviations with wRC+, which is mostly the opposite of what I thought I'd see, so
 #maybe there's an error somewhere. My belief going in was that the closer to 1.00
 #(i.e. Mike Trout) you get, the lower variance you see in their wRC+. Which is probably
-#true if I computed something wrong along the way here
+#true if I computed something wrong along the way here. However, there does seem to be at least
+#some of the graph following this trend.
 
 FG3indvYearHitters <- fg_bat_leaders(x = 2017, y = 2019, league = "all", qual = 100, ind = 1)
 FG3YearHitters <- fg_bat_leaders(x = 2017, y = 2019, league = "all", qual = 100, ind = 0)
